@@ -1,0 +1,148 @@
+name: Self-Healing CI
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]" || pip install -e .
+          pip install pytest pytest-cov
+      
+      - name: Run tests
+        id: tests
+        continue-on-error: true
+        run: |
+          pytest tests/ -v --tb=long 2>&1 | tee test_output.log
+          echo "test_exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
+      
+      - name: Upload test logs
+        if: steps.tests.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: test_output.log
+      
+      - name: Check test results
+        run: |
+          if [ "${{ steps.tests.outcome }}" == "failure" ]; then
+            echo "Tests failed!"
+            exit 1
+          fi
+
+  claude-fix:
+    needs: test
+    if: failure() && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.PAT_TOKEN }}
+      
+      - name: Download test logs
+        uses: actions/download-artifact@v4
+        with:
+          name: test-logs
+          path: .
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]" || pip install -e .
+          pip install pytest pytest-cov
+      
+      - name: Install Claude Code
+        run: |
+          curl -fsSL https://claude.ai/install.sh | bash
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      
+      - name: Claude Fix Build
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          echo "📋 Test failure log:"
+          cat test_output.log
+          
+          echo ""
+          echo "🤖 Asking Claude to fix the build..."
+          
+          CLAUDE_PROMPT=$(cat << 'EOF'
+          The pytest tests are failing. Here is the test output log:
+          
+          $(cat test_output.log)
+          
+          Please:
+          1. Analyze the test failures
+          2. Fix the code to make tests pass
+          3. Run pytest tests/ -v to verify your fix works
+          4. If fixed, commit with message "Claude fix: [description of fix]"
+          
+          Follow the CLAUDE.md guidelines in this repository.
+          Do NOT downgrade dependencies or remove tests to fix issues.
+          Only fix the actual bugs in the code.
+          EOF
+          )
+          
+          # Run Claude with the prompt
+          $HOME/.local/bin/claude -p "$CLAUDE_PROMPT" --allowedTools "Bash,Edit,Write,View,GlobTool,GrepTool" || true
+      
+      - name: Push fixes if any
+        run: |
+          git config user.name "Claude AI"
+          git config user.email "claude@anthropic.com"
+          
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "📝 Changes detected, pushing Claude's fixes..."
+            git add .
+            git commit -m "Claude fix: Auto-fix from CI" || true
+            git push origin HEAD:${{ github.head_ref }}
+            echo "✅ Fixes pushed!"
+          else
+            echo "No changes to push"
+          fi
+      
+      - name: Add label to PR
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['claude-fix-attempted']
+            })
+
