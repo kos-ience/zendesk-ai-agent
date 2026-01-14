@@ -36,14 +36,15 @@ jobs:
         run: |
           set +e
           pytest tests/ -v --tb=long 2>&1 | tee test_output.log
-          EXIT_CODE=$?
+          EXIT_CODE=${PIPESTATUS[0]}
           set -e
           
           echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+          echo "Pytest exit code: $EXIT_CODE"
           
           if [ $EXIT_CODE -ne 0 ]; then
             echo "failed=true" >> $GITHUB_OUTPUT
-            echo "❌ Tests failed with exit code $EXIT_CODE"
+            echo "❌ Tests FAILED with exit code $EXIT_CODE"
           else
             echo "failed=false" >> $GITHUB_OUTPUT
             echo "✅ Tests passed"
