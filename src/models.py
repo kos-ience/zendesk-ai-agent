@@ -112,4 +112,4 @@ class BatchProcessingResult(BaseModel):
         """Calculate success rate."""
         if self.total_tickets == 0:
             return 0.0
-        return self.failed / self.total_tickets
+        return self.successful / self.total_tickets
