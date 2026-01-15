@@ -5,154 +5,119 @@ rootdir: /home/runner/work/zendesk-ai-agent/zendesk-ai-agent
 configfile: pyproject.toml
 plugins: respx-0.22.0, cov-7.0.0, asyncio-1.3.0, mock-3.15.1, anyio-4.12.1
 asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
-collecting ... collected 39 items
+collecting ... collected 39 items / 1 error
 
-tests/test_config.py::TestZendeskSettings::test_valid_settings PASSED    [  2%]
-tests/test_config.py::TestZendeskSettings::test_subdomain_normalization PASSED [  5%]
-tests/test_config.py::TestZendeskSettings::test_invalid_subdomain_with_dot PASSED [  7%]
-tests/test_config.py::TestZendeskSettings::test_empty_subdomain PASSED   [ 10%]
-tests/test_config.py::TestOpenAISettings::test_valid_settings PASSED     [ 12%]
-tests/test_config.py::TestOpenAISettings::test_default_values PASSED     [ 15%]
-tests/test_config.py::TestOpenAISettings::test_invalid_model PASSED      [ 17%]
-tests/test_config.py::TestOpenAISettings::test_temperature_bounds PASSED [ 20%]
-tests/test_config.py::TestOpenAISettings::test_max_tokens_bounds PASSED  [ 23%]
-tests/test_config.py::TestAppSettings::test_default_values PASSED        [ 25%]
-tests/test_config.py::TestAppSettings::test_poll_interval_bounds PASSED  [ 28%]
-tests/test_models.py::TestTicket::test_ticket_creation PASSED            [ 30%]
-tests/test_models.py::TestTicket::test_get_full_context PASSED           [ 33%]
-tests/test_models.py::TestTicket::test_ticket_without_comments PASSED    [ 35%]
-tests/test_models.py::TestAIResponse::test_ai_response_creation PASSED   [ 38%]
-tests/test_models.py::TestProcessingResult::test_successful_result PASSED [ 41%]
-tests/test_models.py::TestProcessingResult::test_failed_result PASSED    [ 43%]
-tests/test_models.py::TestBatchProcessingResult::test_batch_result_success_rate FAILED [ 46%]
-tests/test_models.py::TestBatchProcessingResult::test_empty_batch_success_rate PASSED [ 48%]
-tests/test_openai_client.py::TestOpenAIClient::test_generate_response_success PASSED [ 51%]
-tests/test_openai_client.py::TestOpenAIClient::test_generate_response_with_custom_prompt PASSED [ 53%]
-tests/test_openai_client.py::TestOpenAIClient::test_generate_response_rate_limit PASSED [ 56%]
-tests/test_openai_client.py::TestOpenAIClient::test_generate_response_api_error PASSED [ 58%]
-tests/test_openai_client.py::TestOpenAIClient::test_verify_connection_success PASSED [ 61%]
-tests/test_openai_client.py::TestOpenAIClient::test_context_manager PASSED [ 64%]
-tests/test_processor.py::TestTicketProcessor::test_process_ticket_success_dry_run PASSED [ 66%]
-tests/test_processor.py::TestTicketProcessor::test_process_ticket_success_with_post PASSED [ 69%]
-tests/test_processor.py::TestTicketProcessor::test_process_ticket_zendesk_error PASSED [ 71%]
-tests/test_processor.py::TestTicketProcessor::test_process_ticket_openai_error PASSED [ 74%]
-tests/test_processor.py::TestTicketProcessor::test_process_new_tickets_success FAILED [ 76%]
-tests/test_processor.py::TestTicketProcessor::test_process_new_tickets_partial_failure PASSED [ 79%]
-tests/test_processor.py::TestTicketProcessor::test_process_new_tickets_empty PASSED [ 82%]
-tests/test_zendesk_client.py::TestZendeskClient::test_base_url_construction PASSED [ 84%]
-tests/test_zendesk_client.py::TestZendeskClient::test_get_ticket_success PASSED [ 87%]
-tests/test_zendesk_client.py::TestZendeskClient::test_get_ticket_auth_error PASSED [ 89%]
-tests/test_zendesk_client.py::TestZendeskClient::test_handle_response_rate_limit PASSED [ 92%]
-tests/test_zendesk_client.py::TestZendeskClient::test_add_comment_success PASSED [ 94%]
-tests/test_zendesk_client.py::TestZendeskClient::test_get_new_tickets PASSED [ 97%]
-tests/test_zendesk_client.py::TestZendeskClient::test_context_manager PASSED [100%]
+==================================== ERRORS ====================================
+__________________ ERROR collecting tests/test_validators.py ___________________
 
-=================================== FAILURES ===================================
-___________ TestBatchProcessingResult.test_batch_result_success_rate ___________
-
-self = <tests.test_models.TestBatchProcessingResult object at 0x7f30813e6b90>
-
-    def test_batch_result_success_rate(self):
-        """Test success rate calculation."""
-        results = [
-            ProcessingResult(ticket_id=1, success=True, processing_time_ms=100),
-            ProcessingResult(ticket_id=2, success=True, processing_time_ms=100),
-            ProcessingResult(ticket_id=3, success=False, error_message="Error", processing_time_ms=100),
-            ProcessingResult(ticket_id=4, success=True, processing_time_ms=100),
-        ]
+    """Tests for custom validators."""
     
-        batch = BatchProcessingResult(
-            total_tickets=4,
-            successful=3,
-            failed=1,
-            results=results,
-            started_at=datetime.now(timezone.utc),
-            completed_at=datetime.now(timezone.utc),
+    import pytest
+    from pydantic import ValidationError
+    
+>   from src.validators import TicketInput, ResponseConfig
+
+tests/test_validators.py:6: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Custom validators for data models.
+    
+    DEMO 2 SETUP:
+    =============
+    Current: Pydantic v2 syntax (works with pydantic>=2.0.0)
+    For Demo 2: Uncomment v1 lines, comment out v2 lines, then change pyproject.toml
+    
+    Step 1: Change import (line below)
+    Step 2: Change all @field_validator -> @validator (remove @classmethod)
+    Step 3: Change pyproject.toml: "pydantic>=2.0.0" -> "pydantic>=1.10.0,<2.0.0"
+    Step 4: Push to main, then create PR to bump back to v2
+    """
+    
+    # ===== PYDANTIC V2 (CURRENT) =====
+    # from pydantic import BaseModel, field_validator
+    
+    # ===== PYDANTIC V1 (UNCOMMENT FOR DEMO 2) =====
+    from pydantic import BaseModel, validator
+    
+    
+>   class TicketInput(BaseModel):
+
+src/validators.py:21: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    class TicketInput(BaseModel):
+        """Validates ticket input data before processing."""
+    
+        ticket_id: int
+        subject: str
+        priority: str
+    
+        # ----- V2 SYNTAX (CURRENT) -----
+        # @field_validator('ticket_id')
+        # @classmethod
+        # def ticket_id_must_be_positive(cls, v):
+        #     """Ensure ticket ID is positive."""
+        #     if v <= 0:
+        #         raise ValueError('ticket_id must be positive')
+        #     return v
+    
+        # ----- V1 SYNTAX (UNCOMMENT FOR DEMO 2) -----
+>       @validator('ticket_id')
+         ^^^^^^^^^^^^^^^^^^^^^^
+
+src/validators.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+__field = 'ticket_id', pre = False, each_item = False, always = False
+check_fields = None
+
+    @deprecated(
+        'Pydantic V1 style `@validator` validators are deprecated.'
+        ' You should migrate to Pydantic V2 style `@field_validator` validators,'
+        ' see the migration guide for more details',
+        category=None,
+    )
+    def validator(
+        __field: str,
+        *fields: str,
+        pre: bool = False,
+        each_item: bool = False,
+        always: bool = False,
+        check_fields: bool | None = None,
+        allow_reuse: bool = False,
+    ) -> Callable[[_V1ValidatorType], _V1ValidatorType]:
+        """Decorate methods on the class indicating that they should be used to validate fields.
+    
+        Args:
+            __field (str): The first field the validator should be called on; this is separate
+                from `fields` to ensure an error is raised if you don't pass at least one.
+            *fields (str): Additional field(s) the validator should be called on.
+            pre (bool, optional): Whether this validator should be called before the standard
+                validators (else after). Defaults to False.
+            each_item (bool, optional): For complex objects (sets, lists etc.) whether to validate
+                individual elements rather than the whole object. Defaults to False.
+            always (bool, optional): Whether this method and other validators should be called even if
+                the value is missing. Defaults to False.
+            check_fields (bool | None, optional): Whether to check that the fields actually exist on the model.
+                Defaults to None.
+            allow_reuse (bool, optional): Whether to track and raise an error if another validator refers to
+                the decorated function. Defaults to False.
+    
+        Returns:
+            Callable: A decorator that can be used to decorate a
+                function to be used as a validator.
+        """
+>       warn(
+            'Pydantic V1 style `@validator` validators are deprecated.'
+            ' You should migrate to Pydantic V2 style `@field_validator` validators,'
+            ' see the migration guide for more details',
+            DeprecationWarning,
+            stacklevel=2,
         )
-    
->       assert batch.success_rate == 0.75
-E       AssertionError: assert 0.25 == 0.75
-E        +  where 0.25 = BatchProcessingResult(total_tickets=4, successful=3, failed=1, results=[ProcessingResult(ticket_id=1, success=True, response=None, error_message=None, processing_time_ms=100.0), ProcessingResult(ticket_id=2, success=True, response=None, error_message=None, processing_time_ms=100.0), ProcessingResult(ticket_id=3, success=False, response=None, error_message='Error', processing_time_ms=100.0), ProcessingResult(ticket_id=4, success=True, response=None, error_message=None, processing_time_ms=100.0)], started_at=datetime.datetime(2026, 1, 14, 18, 20, 38, 356448, tzinfo=datetime.timezone.utc), completed_at=datetime.datetime(2026, 1, 14, 18, 20, 38, 356450, tzinfo=datetime.timezone.utc)).success_rate
+E       pydantic.warnings.PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
 
-tests/test_models.py:135: AssertionError
-_____________ TestTicketProcessor.test_process_new_tickets_success _____________
-
-self = <tests.test_processor.TestTicketProcessor object at 0x7f3081374b10>
-processor = <src.processor.TicketProcessor object at 0x7f30813b73d0>
-mock_zendesk_client = <MagicMock spec='ZendeskClient' id='139846304633616'>
-mock_openai_client = <MagicMock spec='OpenAIClient' id='139846305680080'>
-
-    def test_process_new_tickets_success(
-        self,
-        processor: TicketProcessor,
-        mock_zendesk_client: MagicMock,
-        mock_openai_client: MagicMock,
-    ):
-        """Test batch processing of new tickets."""
-        tickets = [
-            Ticket(
-                id=i,
-                subject=f"Ticket {i}",
-                description=f"Description {i}",
-                status=TicketStatus.NEW,
-                requester_id=1,
-                created_at=datetime.now(timezone.utc),
-                updated_at=datetime.now(timezone.utc),
-            )
-            for i in range(1, 4)
-        ]
-    
-        mock_zendesk_client.get_new_tickets.return_value = tickets
-        mock_zendesk_client.get_ticket_with_comments.side_effect = tickets
-    
-        mock_openai_client.generate_response.return_value = AIResponse(
-            ticket_id=0,
-            response_text="Response",
-            model_used="gpt-4",
-            tokens_used=100,
-        )
-    
-        result = processor.process_new_tickets()
-    
-        assert result.total_tickets == 3
-        assert result.successful == 3
-        assert result.failed == 0
->       assert result.success_rate == 1.0
-E       AssertionError: assert 0.0 == 1.0
-E        +  where 0.0 = BatchProcessingResult(total_tickets=3, successful=3, failed=0, results=[ProcessingResult(ticket_id=1, success=True, response=AIResponse(ticket_id=0, response_text='Response', model_used='gpt-4', tokens_used=100, confidence_score=None, generated_at=datetime.datetime(2026, 1, 14, 18, 20, 38, 586814, tzinfo=datetime.timezone.utc)), error_message=None, processing_time_ms=0.290843000001928), ProcessingResult(ticket_id=2, success=True, response=AIResponse(ticket_id=0, response_text='Response', model_used='gpt-4', tokens_used=100, confidence_score=None, generated_at=datetime.datetime(2026, 1, 14, 18, 20, 38, 586814, tzinfo=datetime.timezone.utc)), error_message=None, processing_time_ms=0.30243500000182166), ProcessingResult(ticket_id=3, success=True, response=AIResponse(ticket_id=0, response_text='Response', model_used='gpt-4', tokens_used=100, confidence_score=None, generated_at=datetime.datetime(2026, 1, 14, 18, 20, 38, 586814, tzinfo=datetime.timezone.utc)), error_message=None, processing_time_ms=0.2770370000035882)], started_at=datetime.datetime(2026, 1, 14, 18, 20, 38, 587472, tzinfo=datetime.timezone.utc), completed_at=datetime.datetime(2026, 1, 14, 18, 20, 38, 590381, tzinfo=datetime.timezone.utc)).success_rate
-
-tests/test_processor.py:164: AssertionError
------------------------------ Captured stdout call -----------------------------
-2026-01-14 18:20:38 [info     ] Starting batch processing      max_tickets=10
-2026-01-14 18:20:38 [info     ] Processing ticket              ticket_id=1
-2026-01-14 18:20:38 [info     ] Dry run - skipping Zendesk update response_preview=Response ticket_id=1
-2026-01-14 18:20:38 [info     ] Ticket processed successfully  processing_time_ms=0.290843000001928 ticket_id=1
-2026-01-14 18:20:38 [info     ] Processing ticket              ticket_id=2
-2026-01-14 18:20:38 [info     ] Dry run - skipping Zendesk update response_preview=Response ticket_id=2
-2026-01-14 18:20:38 [info     ] Ticket processed successfully  processing_time_ms=0.30243500000182166 ticket_id=2
-2026-01-14 18:20:38 [info     ] Processing ticket              ticket_id=3
-2026-01-14 18:20:38 [info     ] Dry run - skipping Zendesk update response_preview=Response ticket_id=3
-2026-01-14 18:20:38 [info     ] Ticket processed successfully  processing_time_ms=0.2770370000035882 ticket_id=3
-2026-01-14 18:20:38 [info     ] Batch processing complete      failed=0 success_rate=0.0% successful=3 total=3
-================================ tests coverage ================================
-_______________ coverage: platform linux, python 3.11.14-final-0 _______________
-
-Name                    Stmts   Miss  Cover   Missing
------------------------------------------------------
-src/__init__.py             1      0   100%
-src/config.py              73      4    95%   96-98, 145
-src/exceptions.py          36      4    89%   93, 104-112
-src/logging_config.py      21     10    52%   17-62
-src/main.py               117    117     0%   3-312
-src/models.py              70      0   100%
-src/openai_client.py       80     25    69%   73-85, 94-95, 177-182, 213-252, 283-285
-src/processor.py           89     23    74%   76-77, 121-123, 144-146, 245-247, 251-265, 269-270
-src/zendesk_client.py      91     22    76%   43, 60, 78, 164-186, 253-255, 270-271, 302-312
------------------------------------------------------
-TOTAL                     578    205    65%
+/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/pydantic/deprecated/class_validators.py:112: PydanticDeprecatedSince20
 =========================== short test summary info ============================
-FAILED tests/test_models.py::TestBatchProcessingResult::test_batch_result_success_rate - AssertionError: assert 0.25 == 0.75
- +  where 0.25 = BatchProcessingResult(total_tickets=4, successful=3, failed=1, results=[ProcessingResult(ticket_id=1, success=True, response=None, error_message=None, processing_time_ms=100.0), ProcessingResult(ticket_id=2, success=True, response=None, error_message=None, processing_time_ms=100.0), ProcessingResult(ticket_id=3, success=False, response=None, error_message='Error', processing_time_ms=100.0), ProcessingResult(ticket_id=4, success=True, response=None, error_message=None, processing_time_ms=100.0)], started_at=datetime.datetime(2026, 1, 14, 18, 20, 38, 356448, tzinfo=datetime.timezone.utc), completed_at=datetime.datetime(2026, 1, 14, 18, 20, 38, 356450, tzinfo=datetime.timezone.utc)).success_rate
-FAILED tests/test_processor.py::TestTicketProcessor::test_process_new_tickets_success - AssertionError: assert 0.0 == 1.0
- +  where 0.0 = BatchProcessingResult(total_tickets=3, successful=3, failed=0, results=[ProcessingResult(ticket_id=1, success=True, response=AIResponse(ticket_id=0, response_text='Response', model_used='gpt-4', tokens_used=100, confidence_score=None, generated_at=datetime.datetime(2026, 1, 14, 18, 20, 38, 586814, tzinfo=datetime.timezone.utc)), error_message=None, processing_time_ms=0.290843000001928), ProcessingResult(ticket_id=2, success=True, response=AIResponse(ticket_id=0, response_text='Response', model_used='gpt-4', tokens_used=100, confidence_score=None, generated_at=datetime.datetime(2026, 1, 14, 18, 20, 38, 586814, tzinfo=datetime.timezone.utc)), error_message=None, processing_time_ms=0.30243500000182166), ProcessingResult(ticket_id=3, success=True, response=AIResponse(ticket_id=0, response_text='Response', model_used='gpt-4', tokens_used=100, confidence_score=None, generated_at=datetime.datetime(2026, 1, 14, 18, 20, 38, 586814, tzinfo=datetime.timezone.utc)), error_message=None, processing_time_ms=0.2770370000035882)], started_at=datetime.datetime(2026, 1, 14, 18, 20, 38, 587472, tzinfo=datetime.timezone.utc), completed_at=datetime.datetime(2026, 1, 14, 18, 20, 38, 590381, tzinfo=datetime.timezone.utc)).success_rate
-========================= 2 failed, 37 passed in 0.54s =========================
+ERROR tests/test_validators.py - pydantic.warnings.PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+=============================== 1 error in 0.48s ===============================
