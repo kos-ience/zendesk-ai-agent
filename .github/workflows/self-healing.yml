@@ -114,7 +114,7 @@ jobs:
           echo ""
           echo "🤖 Asking Claude to fix the build..."
           
-          $HOME/.local/bin/claude -p "The pytest tests are failing. Analyze test_output.log, fix the bug in the source code (not the tests), run pytest to verify, and commit with message 'Claude fix: [description]'. Follow CLAUDE.md guidelines." --allowedTools "Bash,Edit,Write,View,GlobTool,GrepTool" || true
+          $HOME/.local/bin/claude --model opus -p "The pytest tests are failing. Analyze test_output.log, fix the bug in the source code (not the tests), run pytest to verify, and commit with message 'Claude fix: [description]'. Follow CLAUDE.md guidelines." --allowedTools "Bash,Edit,Write,View,GlobTool,GrepTool" || true
       
       - name: Push fixes if any
         run: |
