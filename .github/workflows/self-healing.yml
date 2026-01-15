@@ -9,6 +9,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    outputs:
+      tests_failed: ${{ steps.tests.outputs.failed }}
     
     steps:
       - name: Checkout code
@@ -25,34 +27,45 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install langfuse>=2.0.0
+          pip install "langfuse>=2.0.0,<3.0.0"
           pip install -e ".[dev]"
           pip install pytest pytest-cov pytest-asyncio pytest-mock respx
       
       - name: Run tests
         id: tests
-        continue-on-error: true
         run: |
+          set +e
           pytest tests/ -v --tb=long 2>&1 | tee test_output.log
-          echo "test_exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
+          EXIT_CODE=${PIPESTATUS[0]}
+          set -e
+          
+          echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+          echo "Pytest exit code: $EXIT_CODE"
+          
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "failed=true" >> $GITHUB_OUTPUT
+            echo "❌ Tests FAILED with exit code $EXIT_CODE"
+          else
+            echo "failed=false" >> $GITHUB_OUTPUT
+            echo "✅ Tests passed"
+          fi
       
       - name: Upload test logs
-        if: steps.tests.outcome == 'failure'
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-logs
           path: test_output.log
       
-      - name: Check test results
+      - name: Fail job if tests failed
+        if: steps.tests.outputs.failed == 'true'
         run: |
-          if [ "${{ steps.tests.outcome }}" == "failure" ]; then
-            echo "Tests failed!"
-            exit 1
-          fi
+          echo "Tests failed! Triggering claude-fix job..."
+          exit 1
 
   claude-fix:
     needs: test
-    if: failure() && github.event_name == 'pull_request'
+    if: always() && needs.test.outputs.tests_failed == 'true' && github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     
     steps:
@@ -82,7 +95,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install langfuse>=2.0.0
+          pip install "langfuse>=2.0.0,<3.0.0"
           pip install -e ".[dev]"
           pip install pytest pytest-cov pytest-asyncio pytest-mock respx
       
@@ -101,25 +114,7 @@ jobs:
           echo ""
           echo "🤖 Asking Claude to fix the build..."
           
-          CLAUDE_PROMPT=$(cat << 'EOF'
-          The pytest tests are failing. Here is the test output log:
-          
-          $(cat test_output.log)
-          
-          Please:
-          1. Analyze the test failures
-          2. Fix the code to make tests pass
-          3. Run pytest tests/ -v to verify your fix works
-          4. If fixed, commit with message "Claude fix: [description of fix]"
-          
-          Follow the CLAUDE.md guidelines in this repository.
-          Do NOT downgrade dependencies or remove tests to fix issues.
-          Only fix the actual bugs in the code.
-          EOF
-          )
-          
-          # Run Claude with the prompt
-          $HOME/.local/bin/claude -p "$CLAUDE_PROMPT" --allowedTools "Bash,Edit,Write,View,GlobTool,GrepTool" || true
+          $HOME/.local/bin/claude -p "The pytest tests are failing. Analyze test_output.log, fix the bug in the source code (not the tests), run pytest to verify, and commit with message 'Claude fix: [description]'. Follow CLAUDE.md guidelines." --allowedTools "Bash,Edit,Write,View,GlobTool,GrepTool" || true
       
       - name: Push fixes if any
         run: |
@@ -147,4 +142,3 @@ jobs:
               repo: context.repo.repo,
               labels: ['claude-fix-attempted']
             })
-
