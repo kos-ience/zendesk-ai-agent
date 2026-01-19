@@ -151,6 +151,15 @@ def run_continuous(
     return 0
 
 
+def hello() -> str:
+    """Return a hello greeting message.
+
+    Returns:
+        A greeting message string.
+    """
+    return "Hello from Zendesk AI Agent!"
+
+
 def run_batch(
     zendesk_client: ZendeskClient,
     openai_client: OpenAIClient,
@@ -196,6 +205,7 @@ Examples:
   %(prog)s --ticket 12345               Process a specific ticket
   %(prog)s --dry-run --batch            Test without posting responses
   %(prog)s --verify                     Verify API connections only
+  %(prog)s --hello                      Print hello message and exit
         """,
     )
 
@@ -221,6 +231,11 @@ Examples:
         action="store_true",
         help="Verify API connections and exit",
     )
+    mode_group.add_argument(
+        "--hello",
+        action="store_true",
+        help="Print a hello message and exit",
+    )
 
     parser.add_argument(
         "--dry-run",
@@ -244,6 +259,11 @@ def main() -> int:
         Exit code.
     """
     args = parse_args()
+
+    # Handle hello mode early (no configuration needed)
+    if args.hello:
+        print(hello())
+        return 0
 
     # Load environment variables
     load_dotenv(args.env_file)
