@@ -166,3 +166,34 @@ class TestAppSettings:
         # Too high
         with pytest.raises(ValidationError):
             AppSettings(poll_interval_seconds=7200)
+
+
+class TestDummySCRUM10:
+    """Dummy tests for SCRUM-10 ticket validation."""
+
+    def test_dummy_addition(self):
+        """Test basic addition works correctly."""
+        assert 2 + 3 == 5
+
+    def test_dummy_string_operations(self):
+        """Test basic string operations."""
+        result = "SCRUM" + "-" + "10"
+        assert result == "SCRUM-10"
+
+    def test_dummy_list_operations(self):
+        """Test basic list operations."""
+        items = [1, 2, 3, 4, 5]
+        assert len(items) == 5
+        assert sum(items) == 15
+
+    def test_dummy_dict_operations(self):
+        """Test basic dictionary operations."""
+        ticket = {"id": 10, "type": "dummy", "status": "complete"}
+        assert ticket["id"] == 10
+        assert "status" in ticket
+
+    def test_dummy_boolean_logic(self):
+        """Test basic boolean logic."""
+        is_valid = True
+        is_processed = True
+        assert is_valid and is_processed
