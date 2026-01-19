@@ -1,0 +1,39 @@
+# Jira → Claude Auto-Implementation Workflow
+# Triggered when a Jira ticket with "claude" in description is created
+
+name: Jira Claude Trigger
+
+on:
+  repository_dispatch:
+    types: [jira-claude-trigger]
+
+jobs:
+  process-jira-ticket:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 📋 Display Jira Ticket Info
+        run: |
+          echo "=========================================="
+          echo "🎫 JIRA TICKET RECEIVED!"
+          echo "=========================================="
+          echo "Issue Key: ${{ github.event.client_payload.issue_key }}"
+          echo "Summary: ${{ github.event.client_payload.issue_summary }}"
+          echo "=========================================="
+          echo ""
+          echo "✅ Webhook from Jira Automation successful!"
+          echo "📍 Next step: Add Claude Code integration here"
+
+      - name: 🏷️ Create Issue Label (Optional Tracking)
+        run: |
+          echo "Jira ticket ${{ github.event.client_payload.issue_key }} triggered this workflow"
+          echo "Timestamp: $(date)"
+
+      # Future: Add Claude Code automation here
+      # - name: 🤖 Run Claude Code
+      #   run: |
+      #     claude --ticket ${{ github.event.client_payload.issue_key }}
+
