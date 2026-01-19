@@ -140,25 +140,59 @@ jobs:
 
       - name: 💬 Comment on Jira
         if: env.CHANGES_MADE == 'true'
+        env:
+          JIRA_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
         run: |
           echo "📝 Posting comment to Jira..."
           
-          COMMENT="🤖 *Claude has implemented this ticket!*
-
-          ✅ **Pull Request Created:** ${{ env.PR_URL }}
-
-          The implementation is ready for review. Once approved and merged, the self-healing CI will run tests automatically.
-
-          ---
-          _Automated by Jira-Claude Integration_"
-
-          curl -X POST \
-            -H "Authorization: Basic $(echo -n 'sachinkosepaul@gmail.com:${{ secrets.JIRA_API_TOKEN }}' | base64)" \
-            -H "Content-Type: application/json" \
-            -d "{\"body\": \"$COMMENT\"}" \
-            "https://sachinkosepaul.atlassian.net/rest/api/3/issue/${{ github.event.client_payload.issue_key }}/comment"
+          # Create JSON payload file to avoid escaping issues
+          cat > /tmp/jira_comment.json << 'EOF'
+          {
+            "body": {
+              "type": "doc",
+              "version": 1,
+              "content": [
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {"type": "text", "text": "🤖 Claude has implemented this ticket!", "marks": [{"type": "strong"}]}
+                  ]
+                },
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {"type": "text", "text": "✅ Pull Request Created: "},
+                    {"type": "text", "text": "PR_URL_PLACEHOLDER", "marks": [{"type": "link", "attrs": {"href": "PR_URL_PLACEHOLDER"}}]}
+                  ]
+                },
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {"type": "text", "text": "The implementation is ready for review. Once approved and merged, the self-healing CI will run tests automatically."}
+                  ]
+                },
+                {
+                  "type": "paragraph",
+                  "content": [
+                    {"type": "text", "text": "— Automated by Jira-Claude Integration", "marks": [{"type": "em"}]}
+                  ]
+                }
+              ]
+            }
+          }
+          EOF
           
-          echo "✅ Jira comment posted!"
+          # Replace placeholder with actual PR URL
+          sed -i "s|PR_URL_PLACEHOLDER|${{ env.PR_URL }}|g" /tmp/jira_comment.json
+          
+          # Post to Jira
+          curl -s -X POST \
+            -H "Authorization: Basic $(echo -n 'sachinkosepaul@gmail.com:'"$JIRA_TOKEN" | base64)" \
+            -H "Content-Type: application/json" \
+            -d @/tmp/jira_comment.json \
+            "https://sachinkosepaul.atlassian.net/rest/api/3/issue/${{ github.event.client_payload.issue_key }}/comment" \
+            && echo "✅ Jira comment posted!" \
+            || echo "⚠️ Jira comment may have failed"
 
       - name: 📊 Summary
         run: |
