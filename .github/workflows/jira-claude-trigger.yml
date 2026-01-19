@@ -91,14 +91,23 @@ jobs:
 
       - name: 📤 Push Changes
         run: |
+          # Check for uncommitted changes first
           if [ -n "$(git status --porcelain)" ]; then
-            echo "📝 Changes detected, pushing..."
+            echo "📝 Uncommitted changes detected, committing..."
             git add .
             git commit -m "${{ github.event.client_payload.issue_key }}: Implementation by Claude" || true
+          fi
+          
+          # Check if we have any commits beyond main (Claude may have already committed)
+          COMMITS_AHEAD=$(git rev-list --count origin/main..HEAD)
+          echo "Commits ahead of main: $COMMITS_AHEAD"
+          
+          if [ "$COMMITS_AHEAD" -gt 0 ]; then
+            echo "📤 Pushing $COMMITS_AHEAD commit(s) to $BRANCH_NAME..."
             git push origin $BRANCH_NAME
             echo "CHANGES_MADE=true" >> $GITHUB_ENV
           else
-            echo "⚠️ No changes detected"
+            echo "⚠️ No commits to push"
             echo "CHANGES_MADE=false" >> $GITHUB_ENV
           fi
 
