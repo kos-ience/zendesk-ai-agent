@@ -77,3 +77,15 @@ class TestResponseConfig:
             ResponseConfig(max_tokens=100, temperature=2.5)
         assert "temperature must be between" in str(exc_info.value)
 
+    def test_valid_boundary_values(self):
+        """Test valid boundary values for max_tokens and temperature."""
+        # Test minimum valid values
+        config_min = ResponseConfig(max_tokens=1, temperature=0.0)
+        assert config_min.max_tokens == 1
+        assert config_min.temperature == 0.0
+
+        # Test maximum valid values
+        config_max = ResponseConfig(max_tokens=4096, temperature=2.0)
+        assert config_max.max_tokens == 4096
+        assert config_max.temperature == 2.0
+
