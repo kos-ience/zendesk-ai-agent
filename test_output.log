@@ -60,7 +60,7 @@ tests/test_zendesk_client.py::TestZendeskClient::test_context_manager PASSED [10
 =================================== FAILURES ===================================
 ___________ TestBatchProcessingResult.test_batch_result_success_rate ___________
 
-self = <tests.test_models.TestBatchProcessingResult object at 0x7fc956f7a750>
+self = <tests.test_models.TestBatchProcessingResult object at 0x7f4d5a2b6c10>
 
     def test_batch_result_success_rate(self):
         """Test success rate calculation."""
@@ -82,15 +82,15 @@ self = <tests.test_models.TestBatchProcessingResult object at 0x7fc956f7a750>
     
 >       assert batch.success_rate == 0.75
 E       AssertionError: assert 0.25 == 0.75
-E        +  where 0.25 = BatchProcessingResult(total_tickets=4, successful=3, failed=1, results=[ProcessingResult(ticket_id=1, success=True, response=None, error_message=None, processing_time_ms=100.0), ProcessingResult(ticket_id=2, success=True, response=None, error_message=None, processing_time_ms=100.0), ProcessingResult(ticket_id=3, success=False, response=None, error_message='Error', processing_time_ms=100.0), ProcessingResult(ticket_id=4, success=True, response=None, error_message=None, processing_time_ms=100.0)], started_at=datetime.datetime(2026, 1, 20, 12, 51, 3, 538800, tzinfo=datetime.timezone.utc), completed_at=datetime.datetime(2026, 1, 20, 12, 51, 3, 538801, tzinfo=datetime.timezone.utc)).success_rate
+E        +  where 0.25 = BatchProcessingResult(total_tickets=4, successful=3, failed=1, results=[ProcessingResult(ticket_id=1, success=True, response=None, error_message=None, processing_time_ms=100.0), ProcessingResult(ticket_id=2, success=True, response=None, error_message=None, processing_time_ms=100.0), ProcessingResult(ticket_id=3, success=False, response=None, error_message='Error', processing_time_ms=100.0), ProcessingResult(ticket_id=4, success=True, response=None, error_message=None, processing_time_ms=100.0)], started_at=datetime.datetime(2026, 1, 20, 12, 52, 10, 237043, tzinfo=datetime.timezone.utc), completed_at=datetime.datetime(2026, 1, 20, 12, 52, 10, 237045, tzinfo=datetime.timezone.utc)).success_rate
 
 tests/test_models.py:135: AssertionError
 _____________ TestTicketProcessor.test_process_new_tickets_success _____________
 
-self = <tests.test_processor.TestTicketProcessor object at 0x7fc9570e9850>
-processor = <src.processor.TicketProcessor object at 0x7fc956e48cd0>
-mock_zendesk_client = <MagicMock spec='ZendeskClient' id='140502722982096'>
-mock_openai_client = <MagicMock spec='OpenAIClient' id='140502723081168'>
+self = <tests.test_processor.TestTicketProcessor object at 0x7f4d5a279050>
+processor = <src.processor.TicketProcessor object at 0x7f4d5a186290>
+mock_zendesk_client = <MagicMock spec='ZendeskClient' id='139970203216016'>
+mock_openai_client = <MagicMock spec='OpenAIClient' id='139970204323664'>
 
     def test_process_new_tickets_success(
         self,
@@ -129,21 +129,21 @@ mock_openai_client = <MagicMock spec='OpenAIClient' id='140502723081168'>
         assert result.failed == 0
 >       assert result.success_rate == 1.0
 E       AssertionError: assert 0.0 == 1.0
-E        +  where 0.0 = BatchProcessingResult(total_tickets=3, successful=3, failed=0, results=[ProcessingResult(ticket_id=1, success=True, response=AIResponse(ticket_id=0, response_text='Response', model_used='gpt-4', tokens_used=100, confidence_score=None, generated_at=datetime.datetime(2026, 1, 20, 12, 51, 3, 764151, tzinfo=datetime.timezone.utc)), error_message=None, processing_time_ms=0.2606259999993199), ProcessingResult(ticket_id=2, success=True, response=AIResponse(ticket_id=0, response_text='Response', model_used='gpt-4', tokens_used=100, confidence_score=None, generated_at=datetime.datetime(2026, 1, 20, 12, 51, 3, 764151, tzinfo=datetime.timezone.utc)), error_message=None, processing_time_ms=0.27308899999667346), ProcessingResult(ticket_id=3, success=True, response=AIResponse(ticket_id=0, response_text='Response', model_used='gpt-4', tokens_used=100, confidence_score=None, generated_at=datetime.datetime(2026, 1, 20, 12, 51, 3, 764151, tzinfo=datetime.timezone.utc)), error_message=None, processing_time_ms=0.2392860000028918)], started_at=datetime.datetime(2026, 1, 20, 12, 51, 3, 764637, tzinfo=datetime.timezone.utc), completed_at=datetime.datetime(2026, 1, 20, 12, 51, 3, 767069, tzinfo=datetime.timezone.utc)).success_rate
+E        +  where 0.0 = BatchProcessingResult(total_tickets=3, successful=3, failed=0, results=[ProcessingResult(ticket_id=1, success=True, response=AIResponse(ticket_id=0, response_text='Response', model_used='gpt-4', tokens_used=100, confidence_score=None, generated_at=datetime.datetime(2026, 1, 20, 12, 52, 10, 465720, tzinfo=datetime.timezone.utc)), error_message=None, processing_time_ms=0.26273900000006734), ProcessingResult(ticket_id=2, success=True, response=AIResponse(ticket_id=0, response_text='Response', model_used='gpt-4', tokens_used=100, confidence_score=None, generated_at=datetime.datetime(2026, 1, 20, 12, 52, 10, 465720, tzinfo=datetime.timezone.utc)), error_message=None, processing_time_ms=0.2829169999998271), ProcessingResult(ticket_id=3, success=True, response=AIResponse(ticket_id=0, response_text='Response', model_used='gpt-4', tokens_used=100, confidence_score=None, generated_at=datetime.datetime(2026, 1, 20, 12, 52, 10, 465720, tzinfo=datetime.timezone.utc)), error_message=None, processing_time_ms=0.2355889999989813)], started_at=datetime.datetime(2026, 1, 20, 12, 52, 10, 466213, tzinfo=datetime.timezone.utc), completed_at=datetime.datetime(2026, 1, 20, 12, 52, 10, 468665, tzinfo=datetime.timezone.utc)).success_rate
 
 tests/test_processor.py:164: AssertionError
 ----------------------------- Captured stdout call -----------------------------
-2026-01-20 12:51:03 [info     ] Starting batch processing      max_tickets=10
-2026-01-20 12:51:03 [info     ] Processing ticket              ticket_id=1
-2026-01-20 12:51:03 [info     ] Dry run - skipping Zendesk update response_preview=Response ticket_id=1
-2026-01-20 12:51:03 [info     ] Ticket processed successfully  processing_time_ms=0.2606259999993199 ticket_id=1
-2026-01-20 12:51:03 [info     ] Processing ticket              ticket_id=2
-2026-01-20 12:51:03 [info     ] Dry run - skipping Zendesk update response_preview=Response ticket_id=2
-2026-01-20 12:51:03 [info     ] Ticket processed successfully  processing_time_ms=0.27308899999667346 ticket_id=2
-2026-01-20 12:51:03 [info     ] Processing ticket              ticket_id=3
-2026-01-20 12:51:03 [info     ] Dry run - skipping Zendesk update response_preview=Response ticket_id=3
-2026-01-20 12:51:03 [info     ] Ticket processed successfully  processing_time_ms=0.2392860000028918 ticket_id=3
-2026-01-20 12:51:03 [info     ] Batch processing complete      failed=0 success_rate=0.0% successful=3 total=3
+2026-01-20 12:52:10 [info     ] Starting batch processing      max_tickets=10
+2026-01-20 12:52:10 [info     ] Processing ticket              ticket_id=1
+2026-01-20 12:52:10 [info     ] Dry run - skipping Zendesk update response_preview=Response ticket_id=1
+2026-01-20 12:52:10 [info     ] Ticket processed successfully  processing_time_ms=0.26273900000006734 ticket_id=1
+2026-01-20 12:52:10 [info     ] Processing ticket              ticket_id=2
+2026-01-20 12:52:10 [info     ] Dry run - skipping Zendesk update response_preview=Response ticket_id=2
+2026-01-20 12:52:10 [info     ] Ticket processed successfully  processing_time_ms=0.2829169999998271 ticket_id=2
+2026-01-20 12:52:10 [info     ] Processing ticket              ticket_id=3
+2026-01-20 12:52:10 [info     ] Dry run - skipping Zendesk update response_preview=Response ticket_id=3
+2026-01-20 12:52:10 [info     ] Ticket processed successfully  processing_time_ms=0.2355889999989813 ticket_id=3
+2026-01-20 12:52:10 [info     ] Batch processing complete      failed=0 success_rate=0.0% successful=3 total=3
 ================================ tests coverage ================================
 _______________ coverage: platform linux, python 3.11.14-final-0 _______________
 
@@ -163,7 +163,7 @@ src/zendesk_client.py      91     22    76%   43, 60, 78, 164-186, 253-255, 270-
 TOTAL                     617    205    67%
 =========================== short test summary info ============================
 FAILED tests/test_models.py::TestBatchProcessingResult::test_batch_result_success_rate - AssertionError: assert 0.25 == 0.75
- +  where 0.25 = BatchProcessingResult(total_tickets=4, successful=3, failed=1, results=[ProcessingResult(ticket_id=1, success=True, response=None, error_message=None, processing_time_ms=100.0), ProcessingResult(ticket_id=2, success=True, response=None, error_message=None, processing_time_ms=100.0), ProcessingResult(ticket_id=3, success=False, response=None, error_message='Error', processing_time_ms=100.0), ProcessingResult(ticket_id=4, success=True, response=None, error_message=None, processing_time_ms=100.0)], started_at=datetime.datetime(2026, 1, 20, 12, 51, 3, 538800, tzinfo=datetime.timezone.utc), completed_at=datetime.datetime(2026, 1, 20, 12, 51, 3, 538801, tzinfo=datetime.timezone.utc)).success_rate
+ +  where 0.25 = BatchProcessingResult(total_tickets=4, successful=3, failed=1, results=[ProcessingResult(ticket_id=1, success=True, response=None, error_message=None, processing_time_ms=100.0), ProcessingResult(ticket_id=2, success=True, response=None, error_message=None, processing_time_ms=100.0), ProcessingResult(ticket_id=3, success=False, response=None, error_message='Error', processing_time_ms=100.0), ProcessingResult(ticket_id=4, success=True, response=None, error_message=None, processing_time_ms=100.0)], started_at=datetime.datetime(2026, 1, 20, 12, 52, 10, 237043, tzinfo=datetime.timezone.utc), completed_at=datetime.datetime(2026, 1, 20, 12, 52, 10, 237045, tzinfo=datetime.timezone.utc)).success_rate
 FAILED tests/test_processor.py::TestTicketProcessor::test_process_new_tickets_success - AssertionError: assert 0.0 == 1.0
- +  where 0.0 = BatchProcessingResult(total_tickets=3, successful=3, failed=0, results=[ProcessingResult(ticket_id=1, success=True, response=AIResponse(ticket_id=0, response_text='Response', model_used='gpt-4', tokens_used=100, confidence_score=None, generated_at=datetime.datetime(2026, 1, 20, 12, 51, 3, 764151, tzinfo=datetime.timezone.utc)), error_message=None, processing_time_ms=0.2606259999993199), ProcessingResult(ticket_id=2, success=True, response=AIResponse(ticket_id=0, response_text='Response', model_used='gpt-4', tokens_used=100, confidence_score=None, generated_at=datetime.datetime(2026, 1, 20, 12, 51, 3, 764151, tzinfo=datetime.timezone.utc)), error_message=None, processing_time_ms=0.27308899999667346), ProcessingResult(ticket_id=3, success=True, response=AIResponse(ticket_id=0, response_text='Response', model_used='gpt-4', tokens_used=100, confidence_score=None, generated_at=datetime.datetime(2026, 1, 20, 12, 51, 3, 764151, tzinfo=datetime.timezone.utc)), error_message=None, processing_time_ms=0.2392860000028918)], started_at=datetime.datetime(2026, 1, 20, 12, 51, 3, 764637, tzinfo=datetime.timezone.utc), completed_at=datetime.datetime(2026, 1, 20, 12, 51, 3, 767069, tzinfo=datetime.timezone.utc)).success_rate
-========================= 2 failed, 47 passed in 0.57s =========================
+ +  where 0.0 = BatchProcessingResult(total_tickets=3, successful=3, failed=0, results=[ProcessingResult(ticket_id=1, success=True, response=AIResponse(ticket_id=0, response_text='Response', model_used='gpt-4', tokens_used=100, confidence_score=None, generated_at=datetime.datetime(2026, 1, 20, 12, 52, 10, 465720, tzinfo=datetime.timezone.utc)), error_message=None, processing_time_ms=0.26273900000006734), ProcessingResult(ticket_id=2, success=True, response=AIResponse(ticket_id=0, response_text='Response', model_used='gpt-4', tokens_used=100, confidence_score=None, generated_at=datetime.datetime(2026, 1, 20, 12, 52, 10, 465720, tzinfo=datetime.timezone.utc)), error_message=None, processing_time_ms=0.2829169999998271), ProcessingResult(ticket_id=3, success=True, response=AIResponse(ticket_id=0, response_text='Response', model_used='gpt-4', tokens_used=100, confidence_score=None, generated_at=datetime.datetime(2026, 1, 20, 12, 52, 10, 465720, tzinfo=datetime.timezone.utc)), error_message=None, processing_time_ms=0.2355889999989813)], started_at=datetime.datetime(2026, 1, 20, 12, 52, 10, 466213, tzinfo=datetime.timezone.utc), completed_at=datetime.datetime(2026, 1, 20, 12, 52, 10, 468665, tzinfo=datetime.timezone.utc)).success_rate
+========================= 2 failed, 47 passed in 0.59s =========================
