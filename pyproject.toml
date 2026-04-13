@@ -33,7 +33,7 @@ dependencies = [
     "tenacity>=8.2.0",
     "structlog>=23.0.0",
     "httpx>=0.25.0",
-    "python-dotenv>=1.0.0",
+    "python-dotenv>=1.2.2",
     "langfuse>=2.0.0,<3.0.0",
 ]
 
